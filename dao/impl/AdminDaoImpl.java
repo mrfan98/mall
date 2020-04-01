@@ -73,4 +73,25 @@ public class AdminDaoImpl implements AdminDao {
         }
         return admins;
     }
+
+    @Override
+    public void addAdminss(Admin admin) throws SQLException {
+        QueryRunner runner = new QueryRunner(DruidUtils.getDataSource());
+        runner.update("insert into admin values (null,?,?,?)",admin.getEmail(),admin.getNickname(),admin.getPwd());
+
+    }
+
+    @Override
+    public Admin getAdminsInfo(int id) throws SQLException {
+        QueryRunner runner = new QueryRunner(DruidUtils.getDataSource());
+        Admin admin = runner.query("select * from admin where id = ?",new BeanHandler<>(Admin.class), id);
+        return admin;
+    }
+
+    @Override
+    public void updateAdminss(Admin admin) throws SQLException {
+        QueryRunner runner = new QueryRunner(DruidUtils.getDataSource());
+        runner.update("update admin set email = ?,nickname = ? ,pwd = ? where id = ?",
+                admin.getEmail(),admin.getNickname(),admin.getPwd(),admin.getId());
+    }
 }

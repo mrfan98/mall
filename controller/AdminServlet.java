@@ -16,9 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * User: zsquirrel
@@ -52,7 +54,30 @@ public class AdminServlet extends HttpServlet {
             addAdminss(request, response);
         }else if("getSearchAdmins".equals(action)){
             getSearchAdmins(request,response);
+        }else if("updateAdminss".equals(action)){
+            updateAdminss(request,response);
         }
+    }
+
+    private void updateAdminss(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String requsetBody = HttpUtils.getRequestBody(request);
+        Admin admin = gson.fromJson(requsetBody, Admin.class);
+        Result result = new Result();
+        try {
+            int flag = adminService.updateAdminss(admin);
+            if(flag == 0){
+                result.setCode(10000);
+                result.setMessage("该邮箱已存在");
+            } else {
+                result.setCode(0);
+            }
+        } catch (SQLException e) {
+            result.setCode(10000);
+            result.setMessage("当前服务繁忙");
+        } finally {
+            response.getWriter().println(gson.toJson(result));
+        }
+
     }
 
     private void getSearchAdmins(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -72,7 +97,24 @@ public class AdminServlet extends HttpServlet {
      * @param request
      * @param response
      */
-    private void addAdminss(HttpServletRequest request, HttpServletResponse response) {
+    private void addAdminss(HttpServletRequest request, HttpServletResponse response) throws IOException {
+         String requestBody=HttpUtils.getRequestBody(request);
+         Admin admin=gson.fromJson(requestBody,Admin.class);
+         Result result = new Result();
+        try {
+            int flag = adminService.addAdminss(admin);
+            if(flag == 0){
+                result.setCode(10000);
+                result.setMessage("该邮箱已存在");
+            } else {
+                result.setCode(0);
+            }
+        } catch (SQLException e) {
+            result.setCode(10000);
+            result.setMessage("当前服务繁忙");
+        } finally {
+            response.getWriter().println(gson.toJson(result));
+        }
 
     }
 
@@ -120,6 +162,39 @@ public class AdminServlet extends HttpServlet {
         String action = requestURI.replace("/api/admin/admin/", "");
         if("allAdmins".equals(action)){
             allAdmins(request, response);
+        }else if("getAdminsInfo".equals(action)){
+            getAdminsInfo(request,response);
+        }
+    }
+
+    /**
+     * 根据id获取所要修改的管理员信息
+     * @param request
+     * @param response
+     */
+
+    private void getAdminsInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Result result = new Result();
+        String s = request.getParameter("id");
+        if(s == null || s.length() == 0){
+            result.setCode(10000);
+            result.setMessage("参数有问题，请重试");
+            response.getWriter().println(gson.toJson(result));
+            return;
+        }
+        try {
+            int id = Integer.parseInt(s);
+            Admin admin = adminService.getAdminsInfo(id);
+            result.setCode(0);
+            result.setData(admin);
+        } catch (NumberFormatException e) {
+            result.setCode(10000);
+            result.setMessage("参数有问题，请重试");
+        } catch (SQLException e) {
+            result.setCode(10000);
+            result.setMessage("服务器繁忙");
+        } finally {
+            response.getWriter().println(gson.toJson(result));
         }
     }
 

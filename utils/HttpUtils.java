@@ -21,14 +21,14 @@ public class HttpUtils {
      */
     public static String getRequestBody(HttpServletRequest request) throws IOException {
         ServletInputStream inputStream = request.getInputStream();
-        OutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         int length = 0;
         byte[] bytes = new byte[1024];
         while ((length = inputStream.read(bytes)) != -1){
             outputStream.write(bytes, 0, length);
         }
         //该字符串就是我们的请求体
-        return outputStream.toString();
+        return outputStream.toString("utf-8");
 
     }
 }
