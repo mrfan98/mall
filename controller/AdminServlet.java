@@ -44,7 +44,6 @@ public class AdminServlet extends HttpServlet {
      * @throws IOException
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("post");
         String requestURI = request.getRequestURI();
         String action = requestURI.replace("/api/admin/admin/", "");
         System.out.println(action);
@@ -56,6 +55,39 @@ public class AdminServlet extends HttpServlet {
             getSearchAdmins(request,response);
         }else if("updateAdminss".equals(action)){
             updateAdminss(request,response);
+        }else if("changePwd".equals(action)){
+            changePwd(request,response);
+        } else if("logoutAdmin".equals(action)){
+            logoutAdmin(request,response);
+        }
+    }
+
+    private void logoutAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Result result = new Result();
+        request.getSession().setAttribute("name",null);
+        result.setCode(0);
+        response.getWriter().println(gson.toJson(result));
+
+
+    }
+
+    private void changePwd(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String requestBody = HttpUtils.getRequestBody(request);
+        Map map = gson.fromJson(requestBody, Map.class);
+        Result result = new Result();
+        try {
+            String re = adminService.changePwd(map);
+            if("修改成功".equals(re)){
+                result.setCode(0);
+            } else {
+                result.setCode(10000);
+                result.setMessage(re);
+            }
+        } catch (SQLException e) {
+            result.setCode(10000);
+            result.setMessage("服务器繁忙");
+        } finally {
+            response.getWriter().println(gson.toJson(result));
         }
     }
 
@@ -134,6 +166,7 @@ public class AdminServlet extends HttpServlet {
         int result = adminService.login(admin);
         Result res = new Result();
         if(result == 200){
+            request.getSession().setAttribute("name",admin.getEmail());
             res.setCode(0);
             Map<String, String> map = new HashMap<>();
             map.put("token", admin.getEmail());
@@ -164,7 +197,35 @@ public class AdminServlet extends HttpServlet {
             allAdmins(request, response);
         }else if("getAdminsInfo".equals(action)){
             getAdminsInfo(request,response);
+        }else if("deleteAdmins".equals(action)){
+            deleteAdmins(request,response);
         }
+    }
+
+    private void deleteAdmins(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Result result = new Result();
+        String s = request.getParameter("id");
+        if(s == null || s.length() == 0){
+            result.setCode(10000);
+            result.setMessage("参数有问题，请重试");
+            response.getWriter().println(gson.toJson(result));
+            return;
+        }
+        try {
+            int id = Integer.parseInt(s);
+            int flag = adminService.deleteAdmins(id);
+            if(flag == -1){
+                result.setCode(10000);
+                result.setMessage("服务器繁忙，请重试");
+            }
+            result.setCode(0);
+        } catch (NumberFormatException e) {
+            result.setCode(10000);
+            result.setMessage("参数有问题，请重试");
+        } finally {
+            response.getWriter().println(gson.toJson(result));
+        }
+
     }
 
     /**

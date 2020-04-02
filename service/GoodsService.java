@@ -10,7 +10,14 @@ import java.util.List;
  */
 
 public interface GoodsService {
+
+    void deleteGoods(int id)throws SQLException;
+
     List<Goods> queryGoodsByType(int typeId)throws SQLException;
 
-    int addGoods(Goods goods);
+    void addGoods(Goods goods) throws SQLException;
+
+    Goods getGoodInfo(int id) throws SQLException;
+
+    void updateGoods(Goods goods) throws SQLException;
 }

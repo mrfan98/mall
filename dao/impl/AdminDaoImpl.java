@@ -94,4 +94,32 @@ public class AdminDaoImpl implements AdminDao {
         runner.update("update admin set email = ?,nickname = ? ,pwd = ? where id = ?",
                 admin.getEmail(),admin.getNickname(),admin.getPwd(),admin.getId());
     }
+
+    @Override
+    public int deleteAdmins(int id) {
+        QueryRunner queryRunner = new QueryRunner(DruidUtils.getDataSource());
+        int result = 0;
+        try {
+            result = queryRunner.update("delete from admin where id = ?",id);
+        } catch (SQLException e) {
+            return -1;
+        }
+        return result;
+
+    }
+
+    @Override
+    public String getPwd(String email) throws SQLException {
+        QueryRunner runner = new QueryRunner(DruidUtils.getDataSource());
+        String query = runner.query("select pwd from admin where email = ?",
+                new BeanHandler<>(String.class), email);
+        return query;
+    }
+
+    @Override
+    public int updatePwd(String newPwd, String email) throws SQLException {
+        QueryRunner runner = new QueryRunner(DruidUtils.getDataSource());
+        int i = runner.update("update admin set pwd = ? where email = ?", newPwd, email);
+        return i;
+    }
 }

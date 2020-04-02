@@ -2,6 +2,7 @@ package com.cskaoyan.mall.dao;
 
 import com.cskaoyan.mall.bean.Type;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -11,4 +12,6 @@ import java.util.List;
 public interface TypeDao {
     List<Type> getType();
 
+    int deleteType(int typeId)throws SQLException;
+    int addType(Type type);
 }

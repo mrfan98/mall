@@ -22,4 +22,10 @@ public interface AdminDao {
     Admin getAdminsInfo(int id) throws SQLException;
 
     void updateAdminss(Admin admin)throws SQLException;
+
+    int deleteAdmins(int id);
+
+    String getPwd(String email)throws SQLException;
+
+    int updatePwd(String newPwd, String email)throws SQLException;
 }

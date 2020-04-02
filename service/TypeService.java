@@ -2,6 +2,7 @@ package com.cskaoyan.mall.service;
 
 import com.cskaoyan.mall.bean.Type;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -10,4 +11,9 @@ import java.util.List;
 
 public interface TypeService {
     List<Type> getType();
+
+    int addType(Type type);
+
+
+    int deleteType(int typeId)throws SQLException;
 }

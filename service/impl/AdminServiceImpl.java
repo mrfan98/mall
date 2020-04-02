@@ -12,6 +12,7 @@ import com.cskaoyan.mall.service.AdminService;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class AdminServiceImpl implements AdminService {
 
@@ -62,5 +63,31 @@ public class AdminServiceImpl implements AdminService {
         }
         adminDao.updateAdminss(admin);
         return 1;
+    }
+
+    @Override
+    public int deleteAdmins(int id) {
+        return adminDao.deleteAdmins(id);
+    }
+
+    @Override
+    public String changePwd(Map map) throws SQLException {
+        String email =(String) map.get("adminToken");
+        String pwd = (String) map.get("oldPwd");
+        String daoPwd = adminDao.getPwd(email);
+        if(pwd == null || pwd.equals(daoPwd)){
+            return "旧密码错误";
+        }
+        String newPwd = (String) map.get("newPwd");
+        String confirmPwd = (String) map.get("confirmPwd");
+        if(newPwd == null || !newPwd.equals(confirmPwd)){
+            return "两次输入不一致或者为空";
+        }
+        int flag = adminDao.updatePwd(newPwd,email);
+        if(flag == 0){
+            return "没有这个用户";
+        }
+        return "修改成功";
+
     }
 }
